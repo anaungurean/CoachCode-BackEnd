@@ -12,7 +12,6 @@ class Problem(db.Model):
     asked_by_faang = db.Column(db.Boolean, nullable=False)
     similar_questions = db.Column(db.String(1000), nullable=False)
 
-
     @classmethod
     def get_all_problems(cls):
         problems = cls.query.all()
