@@ -11,7 +11,9 @@ def get_all_problems():
 @problem_bp.route('/problems/<int:problem_id>', methods=['GET'])
 def get_problem_by_id(problem_id):
     problem = Problem.get_problem_by_id(problem_id)
+
     if problem:
+        print(problem)
         return jsonify(problem), 200
     else:
         return jsonify({"error": "Problem not found"}), 404

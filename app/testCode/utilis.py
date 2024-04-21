@@ -53,7 +53,7 @@ def test_code(language, code, input_data):
 #     code = '''
 # import java.util.*;
 #
-# class Main {
+# class Solution {
 #     public int[] twoSum(int[] nums, int target) {
 #         for (int index_1 = 0; index_1 < nums.length; index_1++) {
 #             for (int index_2 = index_1 + 1; index_2 < nums.length; index_2++) {
@@ -92,47 +92,7 @@ def test_code(language, code, input_data):
 #     input_data = "2 7 11 15\n9"
 #     print(test_code("java", code, input_data))
 
-#     code = '''
-# #include <iostream>
-# #include <vector>
-#
-# class Solution {
-# public:
-#     std::vector<int> twoSum(std::vector<int>& nums, int target) {
-#         for (int index_1 = 0; index_1 < nums.size(); index_1++) {
-#             for (int index_2 = index_1 + 1; index_2 < nums.size(); index_2++) {
-#                 if (nums[index_1] + nums[index_2] == target) {
-#                     return {index_1, index_2};
-#                 }
-#             }
-#         }
-#         return {};
-#     }
-# };
-#
-# int main() {
-#     std::vector<int> nums;
-#     int num;
-#     std::cout << "Introduceti elementele listei nums separate prin spatiu: ";
-#     while (std::cin >> num) {
-#         nums.push_back(num);
-#     }
-#
-#     int target;
-#     std::cout << "Introduceti valoarea target: ";
-#     std::cin >> target;
-#
-#     Solution solution;
-#     std::vector<int> result = solution.twoSum(nums, target);
-#     if (result.size() == 2) {
-#         std::cout << "Indicii perechii care aduna " << target << " sunt: [" << result[0] << ", " << result[1] << "]" << std::endl;
-#     } else {
-#         std::cout << "Nu s-a gasit nicio pereche cu suma " << target << std::endl;
-#     }
-# }
-# '''
-#     input_data = "2 7 11 15\n9"
-#     print(test_code("c++", code, input_data))
+
 
 
 
