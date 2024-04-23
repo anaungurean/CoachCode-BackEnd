@@ -15,6 +15,8 @@ class Problem(db.Model):
     tests = db.Column(db.JSON, nullable=True)
     input_variables = db.Column(db.JSON, nullable=True)
     solution = db.Column(db.String(1000), nullable=True)
+    hints = db.Column(ARRAY(db.String(1000)), nullable=True)
+    question = db.Column(db.JSON, nullable=True)
 
     @classmethod
     def get_all_problems(cls):
@@ -38,7 +40,9 @@ class Problem(db.Model):
             "similar_questions": self.similar_questions,
             "tests": self.tests,
             "input_variables": self.input_variables,
-            "solution": self.solution
+            "solution": self.solution,
+            "hints": self.hints,
+            "question": self.question
         }
 
 
