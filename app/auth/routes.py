@@ -1,7 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from .user_model import User
 from .reset_code_model import ResetCode
 from .utils import generate_reset_code, send_email, bcrypt_sha256, datetime
+import jwt
+import datetime
 
 auth_bp = Blueprint('users', __name__)
 
@@ -40,7 +42,11 @@ def authenticate_user():
         return jsonify({"error": "There is no account with this email !"}), 404
     else:
         if user.verify_password(password):
-            return jsonify({"message": "Authentication successful"}), 200
+            token = jwt.encode({
+                'user_id': user.id,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+            }, current_app.config['SECRET_KEY'], algorithm="HS256")
+            return jsonify({"message": "Authentication successful", "token": token}), 200
         else:
             return jsonify({"error": "The password is incorrect"}), 401
 
