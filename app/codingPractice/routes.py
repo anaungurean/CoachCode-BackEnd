@@ -33,7 +33,7 @@ def get_all_problems():
     for problem in problems:
         is_solved = check_submission_exists(user_id, problem['id'])
         problem['is_solved'] = is_solved
-        
+
     return jsonify(problems), 200
 
 @problem_bp.route('/problems/<int:problem_id>', methods=['GET'])
