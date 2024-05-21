@@ -35,6 +35,11 @@ class Submission(db.Model):
     def get_submissions_by_user_id_and_problem_id_and_programming_language(cls, user_id, problem_id, programming_language):
         return cls.query.filter_by(user_id=user_id, problem_id=problem_id, programming_language=programming_language).first()
 
+
+    @classmethod
+    def get_submissions_by_user_id_and_problem_id(cls, user_id, problem_id):
+        return cls.query.filter_by(user_id=user_id, problem_id=problem_id).first()
+
     def save_submission(self):
         if self.get_submissions_by_user_id_and_problem_id_and_programming_language(self.user_id, self.problem_id, self.programming_language):
              delete_submission = self.get_submissions_by_user_id_and_problem_id_and_programming_language(self.user_id, self.problem_id, self.programming_language)

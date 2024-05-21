@@ -3,6 +3,7 @@ from functools import wraps
 from flask import Blueprint, jsonify, request, current_app
 from .submission_model import Submission
 import datetime
+from .utils import extract_user_id, get_title_of_problem_by_id
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -61,22 +62,15 @@ def get_submissions_by_user_id(user_id):
 
         # Convert submissions to a JSON serializable format if necessary
         submissions_list = [submission.to_dict() for submission in submissions]
+
+        for submission in submissions_list:
+            submission['problem_title'] = get_title_of_problem_by_id(submission['problem_id'])
+
+        print(submissions_list)
         return jsonify(submissions_list), 200
     except Exception as e:
         # Handle exceptions and return an error message
         return jsonify({"message": "An error occurred.", "error": str(e)}), 500
-
-
-
-
-def extract_user_id(token):
-    try:
-        data = jwt.decode(token.split(' ')[1], current_app.config['SECRET_KEY'], algorithms=["HS256"])
-        return data['user_id']
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Token has expired'}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({'message': 'Invalid token'}), 403
 
 
 @submission_bp.route('/submissions', methods=['POST'])
@@ -106,5 +100,8 @@ def delete_submission(submission_id):
         return jsonify({"message": "Submission deleted"}), 200
     else:
         return jsonify({"error": "Submission not found"}), 404
+
+
+
 
 

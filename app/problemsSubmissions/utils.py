@@ -1,13 +1,14 @@
-from app.problemsSubmissions import Submission
+from app.codingPractice import Problem
 from flask import jsonify, current_app, request
 import jwt
 
-def check_submission_exists(user_id, problem_id):
-    """
-    Check if a submission for a given user_id and problem_id exists.
-    """
-    submission = Submission.get_submissions_by_user_id_and_problem_id(user_id, problem_id)
-    return submission is not None
+def get_title_of_problem_by_id(problem_id):
+    problem = Problem.query.filter_by(id=problem_id).first()
+    if problem:
+        return problem.title
+    else:
+        return None
+
 
 def extract_user_id(token):
     try:
