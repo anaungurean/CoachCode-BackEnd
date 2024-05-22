@@ -13,18 +13,18 @@ class User(db.Model):
     photo_url = db.Column(db.String(255))
     status = db.Column(db.String(100))
     goal = db.Column(db.Text)
-    programming_languages = db.Column(db.ARRAY(db.String))
     linkedin_url = db.Column(db.String(255))
     github_url = db.Column(db.String(255))
+    facebook_url = db.Column(db.String(255))
 
     @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def create_user(cls, email, password, first_name=None, last_name=None, username=None, programming_languages=None, photo_url=None, status=None, goal=None, linkedin_url=None, github_url=None):
+    def create_user(cls, email, password, first_name=None, last_name=None, username=None, photo_url=None, status=None, goal=None, linkedin_url=None, github_url=None, facebook_url=None):
         hashed_password = bcrypt_sha256.hash(password)
-        new_user = cls(first_name=first_name, last_name=last_name, email=email, password=hashed_password, username=username, programming_languages=programming_languages, photo_url=photo_url, status=status, goal=goal, linkedin_url=linkedin_url, github_url=github_url)
+        new_user = cls(first_name=first_name, last_name=last_name, email=email, password=hashed_password, username=username, photo_url=photo_url, status=status, goal=goal, linkedin_url=linkedin_url, github_url=github_url, facebook_url=facebook_url)
         db.session.add(new_user)
         db.session.commit()
         return new_user
@@ -36,6 +36,9 @@ class User(db.Model):
     def verify_password(self, password):
         return bcrypt_sha256.verify(password, self.password)
 
+    def get_photo_url(self):
+        return self.photo_url
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -46,7 +49,8 @@ class User(db.Model):
             'photo_url': self.photo_url,
             'status': self.status,
             'goal': self.goal,
-            'programming_languages': self.programming_languages,
             'linkedin_url': self.linkedin_url,
-            'github_url': self.github_url
+            'github_url': self.github_url,
+            'facebook_url': self.facebook_url
         }
+
