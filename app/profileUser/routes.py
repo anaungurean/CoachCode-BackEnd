@@ -49,8 +49,6 @@ def update_profile():
     user = User.query.filter_by(id=user_id).first()
     data = request.get_json()
 
-    print(data)
-    
     if data.get('username') and data['username'] != user.username and User.query.filter_by(username=data['username']).first():
         return jsonify({'message': 'Username already exists'}), 400
     else:
@@ -95,7 +93,8 @@ def user(user_id):
 def user_photo(user_id):
     user = User.query.get_or_404(user_id)
     photo_path = user.get_photo_url()
-    print(photo_path)
+    if not photo_path:
+        photo_path = 'C:\\Users\\anama\\OneDrive\\Desktop\\BackEnd\\app\\profileUser\\PhotoUser\\default_user_photo.jpg'
     return send_file(photo_path, mimetype='image/jpeg')
 
 
