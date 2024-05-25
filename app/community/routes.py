@@ -7,6 +7,7 @@ from .like_models import QuestionLike, AnswerLike
 from .utils import extract_user_id
 from flask import send_file
 import os
+from werkzeug.utils import secure_filename
 
 community_bp = Blueprint('community', __name__)
 
@@ -25,7 +26,6 @@ def token_required(f):
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Invalid token'}), 403
 
-        # Dacă tokenul este valid, permite accesul la ruta protejată
         return f(*args, **kwargs)
 
     return decorated
@@ -53,26 +53,27 @@ def get_all_questions():
 @community_bp.route('/questions', methods=['POST'])
 @token_required
 def post_question():
-    data = request.json
-    title = data.get('title')
-    content = data.get('content')
-    topic = data.get('topic')
+    title = request.form.get('title')
+    content = request.form.get('content')
+    topic = request.form.get('topic')
     file = request.files.get('photo')
+    save_path = None
 
     if not title or not content:
         return jsonify({'message': 'Title and content are required'}), 400
 
     if file:
-        filename = f'question_{title}.png'
+        filename = secure_filename(f'question_{title}.png')
         save_path = os.path.join('C:\\Users\\anama\\OneDrive\\Desktop\\BackEnd\\app\\community\\PhotoQuestion', filename)
         file.save(save_path)
 
-    user_id = extract_user_id(request)
+    token = request.headers.get('Authorization')
+    user_id = extract_user_id(token)
     new_question = Question(title=title, content=content, topic=topic, photo=save_path, user_id=user_id)
     new_question.save()
 
-
     return jsonify({'message': 'Question posted successfully'}), 201
+
 
 @community_bp.route('/questions/<int:question_id>', methods=['GET'])
 @token_required
