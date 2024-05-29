@@ -6,6 +6,7 @@ from .answer_model import Answer
 from .like_models import QuestionLike, AnswerLike
 from .utils import extract_user_id
 from flask import send_file
+from ..auth import User
 import os
 from werkzeug.utils import secure_filename
 
@@ -37,6 +38,8 @@ def get_all_questions():
     questions = Question.query.all()
     output = []
     for question in questions:
+        user_id = question.user_id
+        user = User.query.get(user_id)
         question_data = {
             'id': question.question_id,
             'title': question.title,
@@ -44,10 +47,23 @@ def get_all_questions():
             'posting_date': question.posting_date,
             'user_id': question.user_id,
             'topic': question.topic,
-            'photo': question.photo
+            'photo': question.photo,
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }
         output.append(question_data)
-    return jsonify({'questions': output})
+    print(output)
+    return jsonify(output)
+
+
+@community_bp.route('/questions_photo/<int:question_id>', methods=['GET'])
+def get_question_photo(question_id):
+    question = Question.query.get_or_404(question_id)
+    if not question.photo:
+        return jsonify({'message': 'This question does not have a photo'}), 404
+    return send_file(question.photo, mimetype='image/jpeg')
+
+
 
 
 @community_bp.route('/questions', methods=['POST'])
@@ -116,15 +132,15 @@ def delete_question(question_id):
 @community_bp.route('/questions/<int:question_id>/answers', methods=['POST'])
 @token_required
 def post_answer(question_id):
-    data = request.json
-    content = data.get('content')
-    if not content:
-        return jsonify({'message': 'Content is required for the answer'}), 400
-
-    user_id = extract_user_id(request)
-    new_answer = Answer(question_id=question_id, content=content, user_id=user_id)
+    token = request.headers.get('Authorization')
+    user_id = extract_user_id(token)
+    question = Question.query.get_or_404(question_id)
+    content = request.json.get('content')
+    new_answer = Answer(content=content, user_id=user_id, question_id=question_id)
     new_answer.save()
     return jsonify({'message': 'Answer posted successfully'}), 201
+
+
 
 @community_bp.route('/questions/<int:question_id>/answers', methods=['GET'])
 @token_required
@@ -132,33 +148,24 @@ def get_answers(question_id):
     answers = Answer.query.filter_by(question_id=question_id).all()
     output = []
     for answer in answers:
+        user = User.query.get(answer.user_id)
         answer_data = {
             'id': answer.answer_id,
             'content': answer.content,
             'posting_date': answer.posting_date,
             'user_id': answer.user_id,
-            'question_id': answer.question_id
+            'question_id': answer.question_id,
+            'first_name': user.first_name,
+            'last_name': user.last_name
         }
         output.append(answer_data)
-    return jsonify({'answers': output})
-
-
-@community_bp.route('/questions/<int:question_id>/answers/<int:answer_id>', methods=['GET'])
-@token_required
-def get_answer(question_id, answer_id):
-    answer = Answer.query.get_or_404(answer_id)
-    return jsonify({
-        'id': answer.answer_id,
-        'content': answer.content,
-        'posting_date': answer.posting_date,
-        'user_id': answer.user_id,
-        'question_id': answer.question_id
-    })
+    return jsonify(output)
 
 @community_bp.route('/questions/<int:question_id>/like', methods=['POST'])
 @token_required
 def like_question(question_id):
-    user_id = extract_user_id(request)
+    token = request.headers.get('Authorization')
+    user_id = extract_user_id(token)
     existing_like = QuestionLike.query.filter_by(question_id=question_id, user_id=user_id).first()
     if existing_like:
         return jsonify({'message': 'You have already liked this question'}), 400
@@ -170,7 +177,8 @@ def like_question(question_id):
 @community_bp.route('/questions/<int:question_id>/like', methods=['DELETE'])
 @token_required
 def unlike_question(question_id):
-    user_id = extract_user_id(request)
+    token = request.headers.get('Authorization')
+    user_id = extract_user_id(token)
     existing_like = QuestionLike.query.filter_by(question_id=question_id, user_id=user_id).first()
     if not existing_like:
         return jsonify({'message': 'You have not liked this question yet'}), 400
@@ -179,43 +187,23 @@ def unlike_question(question_id):
     return jsonify({'message': 'Question unliked successfully'}), 200
 
 
-@community_bp.route('/questions/search', methods=['GET'])
+@community_bp.route('/questions/<int:question_id>/is_liked', methods=['GET'])
 @token_required
-def search_questions():
-    topic = request.args.get('topic')
-    if not topic:
-        return jsonify({'message': 'Topic parameter is required for search'}), 400
+def is_question_liked(question_id):
+    token = request.headers.get('Authorization')
+    user_id = extract_user_id(token)
+    existing_like = QuestionLike.query.filter_by(question_id=question_id, user_id=user_id).first()
+    if existing_like:
+        return jsonify(True)
+    return jsonify(False)
 
-    questions = Question.query.filter_by(topic=topic).all()
-    output = []
-    for question in questions:
-        question_data = {
-            'id': question.question_id,
-            'title': question.title,
-            'content': question.content,
-            'posting_date': question.posting_date,
-            'user_id': question.user_id,
-            'topic': question.topic,
-            'photo': question.photo
-        }
-        output.append(question_data)
-
-    return jsonify({'questions': output})
 
 
 @community_bp.route('/questions/<int:question_id>/likes', methods=['GET'])
 @token_required
 def get_question_likes(question_id):
     likes = QuestionLike.query.filter_by(question_id=question_id).all()
-    output = []
-    for like in likes:
-        like_data = {
-            'id': like.like_id,
-            'question_id': like.question_id,
-            'user_id': like.user_id
-        }
-        output.append(like_data)
-    return jsonify({'likes': output})
+    return jsonify(len(likes))
 
 
 

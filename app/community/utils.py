@@ -1,4 +1,3 @@
-from app.codingPractice import Problem
 from flask import jsonify, current_app, request
 import jwt
 
