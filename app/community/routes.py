@@ -35,7 +35,7 @@ def token_required(f):
 @community_bp.route('/questions', methods=['GET'])
 @token_required
 def get_all_questions():
-    questions = Question.query.all()
+    questions = Question.query.order_by(Question.posting_date.desc()).all()
     output = []
     for question in questions:
         user_id = question.user_id
@@ -52,7 +52,6 @@ def get_all_questions():
             'last_name': user.last_name
         }
         output.append(question_data)
-    print(output)
     return jsonify(output)
 
 
