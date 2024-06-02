@@ -108,23 +108,37 @@ def get_question(question_id):
 @community_bp.route('/questions/<int:question_id>', methods=['PUT'])
 @token_required
 def update_question(question_id):
+    title = request.form.get('title')
+    content = request.form.get('content')
+    topic = request.form.get('topic')
+    file = request.files.get('photo')
+    save_path = None
+
+    if file:
+        filename = secure_filename(f'question_{title}.png')
+        save_path = os.path.join('C:\\Users\\anama\\OneDrive\\Desktop\\BackEnd\\app\\community\\PhotoQuestion', filename)
+        file.save(save_path)
+
     question = Question.query.get_or_404(question_id)
-    data = request.json
-    question.title = data.get('title', question.title)
-    question.content = data.get('content', question.content)
-    question.topic = data.get('topic', question.topic)
-    question.photo = data.get('photo', question.photo)
+    question.title = title
+    question.content = content
+    question.topic = topic
+    question.photo = save_path
     question.save()
-    return jsonify({'message': 'Question updated successfully'})
+    return jsonify({'message': 'Question updated successfully'}), 200
+
 
 
 @community_bp.route('/questions/<int:question_id>', methods=['DELETE'])
 @token_required
 def delete_question(question_id):
+    likes = QuestionLike.query.filter_by(question_id=question_id).all()
+    for like in likes:
+        like.delete()
+    answers = Answer.query.filter_by(question_id=question_id).all()
+    for ans in answers:
+        ans.delete()
     question = Question.query.get_or_404(question_id)
-    if question.user_id != extract_user_id(request):
-        return jsonify({'message': 'You are not authorized to delete this question'}), 403
-
     question.delete()
     return jsonify({'message': 'Question deleted successfully'}), 200
 
