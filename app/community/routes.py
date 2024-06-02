@@ -219,4 +219,14 @@ def get_question_likes(question_id):
     return jsonify(len(likes))
 
 
+@community_bp.route('/answers/<int:answer_id>' , methods=['DELETE'])
+@token_required
+def delete_answer(answer_id):
+    answer = Answer.query.get_or_404(answer_id)
+    answer.delete()
+    return jsonify({'message': 'Answer deleted successfully'}), 200
+
+
+
+
 
