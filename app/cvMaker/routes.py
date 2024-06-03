@@ -35,6 +35,7 @@ def generate_pdf():
               'margin-right': '0mm',
                     'margin-bottom': '0mm',
                         'margin-left': '0mm',
+        'enable-local-file-access': '',
 
 
     }

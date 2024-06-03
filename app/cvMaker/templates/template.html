@@ -39,16 +39,14 @@
 
         .contact-info {
             display: flex;
-            justify-content: center;
+            justify-content: flex-end; /* Align contact info to the right */
             gap: 5px;
             flex-wrap: wrap;
+            margin-right: 20px; /* Add margin to the right for spacing */
         }
 
-        .contact-info p {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .contact-info-item {
+            margin-top: 5px; /* Add some spacing between each contact info item */
         }
 
         section {
@@ -75,20 +73,26 @@
             justify-content: space-between;
         }
 
-        .school-details {
+      .school-details {
             display: flex;
             justify-content: space-between;
-            width: 100%;
-        }
-
-        .school-info {
-            flex-grow: 1;
         }
 
         .graduation-info {
-            flex-shrink: 0;
-            text-align: right;
-        }
+    display: flex;
+    justify-content: space-between;
+}
+
+.degree-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.other-info {
+    text-align: right;
+}
+
+
 
         a {
             color: #4CAF50;
@@ -105,10 +109,18 @@
     <header>
         <h1>{{ formData.firstName }} {{ formData.lastName }}</h1>
         <div class="contact-info">
-            <p><i class="fas fa-envelope icon"></i> <a href="mailto:{{ formData.email }}">{{ formData.email }}</a></p>
-            <p><i class="fas fa-phone icon"></i> <a href="tel:{{ formData.phone }}">{{ formData.phone }}</a></p>
-            <p><i class="fab fa-linkedin icon"></i> <a href="{{ formData.linkedin }}" target="_blank">{{ formData.linkedin }}</a></p>
-            <p><i class="fab fa-github icon"></i> <a href="{{ formData.github }}" target="_blank">{{ formData.github }}</a></p>
+            <div class="contact-info-item">
+                <p><i class="fas fa-envelope icon"></i> <a href="mailto:{{ formData.email }}">{{ formData.email }}</a></p>
+            </div>
+            <div class="contact-info-item">
+                <p><i class="fas fa-phone icon"></i> <a href="tel:{{ formData.phone }}">{{ formData.phone }}</a></p>
+            </div>
+            <div class="contact-info-item">
+                <p><i class="fab fa-linkedin icon"></i> <a href="{{ formData.linkedin }}" target="_blank">{{ formData.linkedin }}</a></p>
+            </div>
+            <div class="contact-info-item">
+                <p><i class="fab fa-github icon"></i> <a href="{{ formData.github }}" target="_blank">{{ formData.github }}</a></p>
+            </div>
         </div>
     </header>
     <section id="about">
@@ -117,25 +129,30 @@
     </section>
 
     <section id="education">
-        <h2>Education</h2>
-        <ul>
-            {% for school in formData.schools %}
-            <li>
-                <div class="school-details">
-                    <div class="school-info">
-                        <strong>{{ school.school }}</strong>
-                        <p>{{ school.degree}}</p>
+    <h2>Education</h2>
+    <ul>
+        {% for school in formData.schools %}
+        <li>
+            <div class="school-details">
+                <div class="school-info">
+                    <strong>{{ school.school }}</strong>
+                </div>
+                <div class="graduation-info">
+                    <div class="degree-info">
+                        <small>{{ school.degree }}</small>
                     </div>
-                    <div class="graduation-info">
-                        {{ school.graduationYear }} - {{ school.city }}
+                    <div class="other-info">
+                        <small>{{ school.graduationYear }}</small>
+                        <small>{{ school.city }}</small>
                     </div>
                 </div>
-            </li>
-            {% endfor %}
-        </ul>
-    </section>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</section>
 
-     <section id="work-experience">
+    <section id="work-experience">
         <h2>Work Experience</h2>
         <ul>
             {% for job in formData.workExperiences %}
@@ -152,10 +169,6 @@
         </ul>
     </section>
 
-
-
-
-
     <section id="projects">
         <h2>Projects</h2>
         <ul>
@@ -170,16 +183,14 @@
         </ul>
     </section>
 
-   <section id="technical-skills">
-    <h2>Technical Skills</h2>
-       <ul >
-        <li><strong>Languages:</strong> {{ formData.technicalSkills_languages }}</li>
-        <li><strong>Frameworks:</strong> {{ formData.technicalSkills_frameworks }}</li>
-        <li><strong>Developer Tools:</strong> {{ formData.technicalSkills_developmentTools }}</li>
-         </ul>
-</section>
-
-
+    <section id="technical-skills">
+        <h2>Technical Skills</h2>
+        <ul>
+            <li><strong>Languages:</strong> {{ formData.technicalSkills_languages }}</li>
+            <li><strong>Frameworks:</strong> {{ formData.technicalSkills_frameworks }}</li>
+            <li><strong>Developer Tools:</strong> {{ formData.technicalSkills_developmentTools }}</li>
+        </ul>
+    </section>
 
     <section id="soft-skills">
         <h2>Soft Skills</h2>
