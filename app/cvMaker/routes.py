@@ -1,44 +1,46 @@
 import os
-import subprocess
 from flask import Blueprint, request, send_file, render_template_string
+import pdfkit
 
 cvMaker_bp = Blueprint('cvMaker', __name__)
-
 
 @cvMaker_bp.route('/generate_pdf', methods=['POST'])
 def generate_pdf():
     formData = request.json
     print(formData)
 
-    # Render the LaTeX template with formData
-    latex_template_path = 'app/cvMaker/templates/template.tex'
-    with open(latex_template_path) as f:
-        latex_template = f.read()
 
-    rendered_latex = render_template_string(latex_template, formData=formData)
+    html_template_path = os.path.join(os.path.dirname(__file__), 'templates', 'template.html')
+    with open(html_template_path, 'r') as file:
+        html_template = file.read()
 
-    # Define the path for the temporary LaTeX and PDF files
+
+    # Render the HTML template with formData
+    rendered_html = render_template_string(html_template, formData=formData)
+
+    # Define the path for the temporary PDF file
     temp_dir = os.path.join(os.path.dirname(__file__), 'temp_files')
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
-    tex_path = os.path.join(temp_dir, 'resume.tex')
     pdf_path = os.path.join(temp_dir, 'resume.pdf')
 
-    # Save the rendered LaTeX to a file
-    with open(tex_path, 'w') as tex_file:
-        tex_file.write(rendered_latex)
+    # Specify the path to wkhtmltopdf executable
+    config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
 
-    # Run pdflatex to convert the LaTeX file to PDF
-    try:
-        result = subprocess.run(['pdflatex', '-output-directory', temp_dir, tex_path], check=True,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(result.stdout.decode())
-        print(result.stderr.decode())
-    except subprocess.CalledProcessError as e:
-        print(e.stdout.decode())
-        print(e.stderr.decode())
-        return str(e), 500
+    # Configure options for pdfkit (optional)
+    options = {
+        'page-size': 'A4',
+           'margin-top': '0mm',
+              'margin-right': '0mm',
+                    'margin-bottom': '0mm',
+                        'margin-left': '0mm',
+
+
+    }
+
+    # Convert the HTML to PDF using pdfkit
+    pdfkit.from_string(rendered_html, pdf_path, options=options, configuration=config)
 
     # Check if the PDF file was created
     if not os.path.exists(pdf_path):

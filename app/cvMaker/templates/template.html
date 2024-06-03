@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #4CAF51;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        header p {
+            margin: 5px 0;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .contact-info p {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        section {
+            background-color: white;
+            padding: 1px 10px 2px;
+            border-radius: 8px;
+            margin: 15px 15px 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        section h2 {
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .school-details {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .school-info {
+            flex-grow: 1;
+        }
+
+        .graduation-info {
+            flex-shrink: 0;
+            text-align: right;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>{{ formData.firstName }} {{ formData.lastName }}</h1>
+        <div class="contact-info">
+            <p><i class="fas fa-envelope icon"></i> <a href="mailto:{{ formData.email }}">{{ formData.email }}</a></p>
+            <p><i class="fas fa-phone icon"></i> <a href="tel:{{ formData.phone }}">{{ formData.phone }}</a></p>
+            <p><i class="fab fa-linkedin icon"></i> <a href="{{ formData.linkedin }}" target="_blank">{{ formData.linkedin }}</a></p>
+            <p><i class="fab fa-github icon"></i> <a href="{{ formData.github }}" target="_blank">{{ formData.github }}</a></p>
+        </div>
+    </header>
+    <section id="about">
+        <h2>About Me</h2>
+        <p>{{ formData.description }}</p>
+    </section>
+
+    <section id="education">
+        <h2>Education</h2>
+        <ul>
+            {% for school in formData.schools %}
+            <li>
+                <div class="school-details">
+                    <div class="school-info">
+                        <strong>{{ school.school }}</strong>
+                        <p>{{ school.degree}}</p>
+                    </div>
+                    <div class="graduation-info">
+                        {{ school.graduationYear }} - {{ school.city }}
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+     <section id="work-experience">
+        <h2>Work Experience</h2>
+        <ul>
+            {% for job in formData.workExperiences %}
+            <li>
+                <strong>{{ job.position }}</strong>, {{ job.company }} - {{ job.location }}<br>
+                <small>{{ job.startDate }} - {{ job.endDate }}</small><br>
+                <div class="responsibilities">Responsibilities:
+                    <ul>
+                        <li>{{ job.responsibilities }}</li>
+                    </ul>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+
+
+
+
+    <section id="projects">
+        <h2>Projects</h2>
+        <ul>
+            {% for project in formData.projects %}
+            <li>
+                <strong>{{ project.name }}</strong><br>
+                {{ project.description }}<br>
+                Technologies: {{ project.technologies }}<br>
+                Link: <a href="{{ project.link }}" target="_blank">{{ project.link }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+   <section id="technical-skills">
+    <h2>Technical Skills</h2>
+       <ul >
+        <li><strong>Languages:</strong> {{ formData.technicalSkills_languages }}</li>
+        <li><strong>Frameworks:</strong> {{ formData.technicalSkills_frameworks }}</li>
+        <li><strong>Developer Tools:</strong> {{ formData.technicalSkills_developmentTools }}</li>
+         </ul>
+</section>
+
+
+
+    <section id="soft-skills">
+        <h2>Soft Skills</h2>
+        <p>{{ formData.softSkills }}</p>
+    </section>
+</body>
+
+</html>
