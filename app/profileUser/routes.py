@@ -86,7 +86,7 @@ def all_users():
 @token_required
 def user(user_id):
     user = User.query.filter_by(id=user_id).first()
-    return jsonify(user), 200
+    return jsonify(user.to_dict()), 200
 
 
 @profileUser_bp.route('/user_photo/<int:user_id>', methods=['GET'])
