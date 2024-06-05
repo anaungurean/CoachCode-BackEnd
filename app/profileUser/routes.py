@@ -153,4 +153,11 @@ def update_password():
     return jsonify({'message': 'Password updated'}), 200
 
 
+@profileUser_bp.route('/user_name/<int:user_id>', methods=['GET'])
+@token_required
+def user_name(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    return jsonify({'firstName': user.first_name}), 200
+
+
 

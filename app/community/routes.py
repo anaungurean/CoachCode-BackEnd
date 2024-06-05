@@ -94,15 +94,21 @@ def post_question():
 @token_required
 def get_question(question_id):
     question = Question.query.get_or_404(question_id)
-    return jsonify({
+    output = []
+    user = User.query.get(question.user_id)
+    question_data = {
         'id': question.question_id,
         'title': question.title,
         'content': question.content,
         'posting_date': question.posting_date,
         'user_id': question.user_id,
         'topic': question.topic,
-        'photo': question.photo
-    })
+        'photo': question.photo,
+        'first_name': user.first_name,
+        'last_name': user.last_name
+    }
+    output.append(question_data)
+    return jsonify(output)
 
 
 @community_bp.route('/questions/<int:question_id>', methods=['PUT'])

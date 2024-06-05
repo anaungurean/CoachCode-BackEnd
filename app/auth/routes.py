@@ -111,3 +111,4 @@ def reset_password():
         return jsonify({"message": "Password reset successfully"}), 200
     else:
         return jsonify({"error": "User not found"}), 404
+
