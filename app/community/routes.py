@@ -108,7 +108,7 @@ def get_question(question_id):
         'last_name': user.last_name
     }
     output.append(question_data)
-    return jsonify(output)
+    return output
 
 
 @community_bp.route('/questions/<int:question_id>', methods=['PUT'])

@@ -64,14 +64,17 @@ def get_notifications(user_id):
     return output, 200
 
 
-@notifications_bp.route('/seen_notification/<int:question_id>', methods=['PUT'])
+@notifications_bp.route('/seen_notification/<int:question_id>/<int:notification_id>', methods=['PUT'])
 @token_required
-def seen_notification(question_id):
-    notifications = Notification.query.filter_by(question_id=question_id).all()
+def seen_notification(question_id, notification_id):
+    notifications = Notification.query.filter_by(question_id=question_id, id=notification_id).all()
     for notification in notifications:
         notification.seen = True
-        db.session.commit()
-    return jsonify({'message': 'Notifications marked as seen'}), 200
+    db.session.commit()
+    return jsonify({'message': 'Notification seen'}), 200
+f
+
+
 
 
 
