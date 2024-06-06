@@ -8,6 +8,7 @@ from .profileUser.routes import profileUser_bp
 from .community.routes import community_bp
 from  .cvMaker.routes import cvMaker_bp
 from .notifications.routes import notifications_bp
+from .chatBot.routes import chatBot_bp
 
 def create_app():
     app = Flask(__name__)
@@ -21,6 +22,7 @@ def create_app():
     app.register_blueprint(community_bp)
     app.register_blueprint(cvMaker_bp)
     app.register_blueprint(notifications_bp)
+    app.register_blueprint(chatBot_bp)
 
     CORS(app)
 

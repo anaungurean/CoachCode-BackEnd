@@ -29,8 +29,6 @@ def token_required(f):
 @token_required
 def post_notification():
     data = request.get_json()
-    print(data)
-
     notification = Notification(
         user_id_that_triggered=data.get('user_id_that_triggered_notification'),
         user_id_to_be_notified=data.get('user_id_to_be_notified'),
@@ -60,7 +58,6 @@ def get_notifications(user_id):
             'created_at': notification.created_at
         }
         output.append(notification_data)
-    print(output)
     return output, 200
 
 
@@ -72,7 +69,6 @@ def seen_notification(question_id, notification_id):
         notification.seen = True
     db.session.commit()
     return jsonify({'message': 'Notification seen'}), 200
-f
 
 
 
