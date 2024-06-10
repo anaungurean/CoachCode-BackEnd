@@ -121,3 +121,61 @@ def chat_ava():
     return jsonify({"response": chat_response, "conversation_history": conversation_history})
 
 
+@chatBot_bp.route('/generateHRQuestions', methods=['POST'])
+def generateHRQuestions():
+    data = request.get_json()
+    job_title = data.get('jobTitle')
+    number_of_questions = data.get('numberOfQuestions')
+
+    # Ensure job_title and number_of_questions are provided
+    if not job_title or not number_of_questions:
+        return jsonify({"error": "Both jobTitle and numberOfQuestions are required"}), 400
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a highly skilled HR interviewer. Generate {number_of_questions} HR interview questions for the role of {job_title}. These should be common HR questions, focusing on behavioral and situational aspects, rather than technical specifics. Start with easier questions like 'Tell me about yourself' and gradually move to more complex questions."
+            }
+        ]
+    )
+
+    generated_questions = response.choices[0].message['content'].strip('" ')
+
+    question_list = [q.strip() for q in generated_questions.split('\n') if q.strip()]
+
+    return jsonify({"questions": question_list})
+
+
+@chatBot_bp.route('/generateFeedbackHR', methods=['POST'])
+def generateFeedbackHR():
+    data = request.get_json()
+    interview_data = data.get('interviewData')
+    print(interview_data)
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are Mia, an HR professional providing feedback to a candidate. Write concise feedback for this {interview_data} . Include both positive aspects and areas for improvement. Be constructive and supportive."
+            }
+        ]
+    )
+    feedback = response.choices[0].message['content'].strip('" ')
+    print(feedback)
+
+    return jsonify({"feedback": feedback})
+
+
+
+
+
+
+
+
+
+
+
+
