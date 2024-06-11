@@ -141,7 +141,7 @@ def generateHRQuestions():
         ]
     )
 
-    generated_questions = response.choices[0].message['content'].strip('" ')
+    generated_questions = response.choices[0].message['content'].strip()
 
     question_list = [q.strip() for q in generated_questions.split('\n') if q.strip()]
 
@@ -159,17 +159,78 @@ def generateFeedbackHR():
         messages=[
             {
                 "role": "system",
-                "content": f"You are Mia, an HR professional providing feedback to a candidate. Write concise feedback for this {interview_data} . Include both positive aspects and areas for improvement. Be constructive and supportive."
+                "content": (
+                    "You are Mia, an HR professional providing feedback to the candidate. For each interview question, provide structured feedback "
+                    "with the following format:\n\n"
+                    "Question: [The interview question]\n"
+                    "Answer: [The candidate's response]\n"
+                    "\tplus: [Positive aspects of the answer]\n"
+                    "\tminus: [Areas for improvement]\n\n"
+                    "Be constructive and supportive in your feedback. Here is the interview data:\n\n"
+                    f"{interview_data}"
+                )
             }
         ]
     )
-    feedback = response.choices[0].message['content'].strip('" ')
-    print(feedback)
 
+    feedback = response.choices[0].message['content'].strip('" ')
     return jsonify({"feedback": feedback})
 
 
+@chatBot_bp.route('/generateTechnicalQuestions', methods=['POST'])
+def generateTechnicalQuestions():
+    data = request.get_json()
+    job_title = data.get('jobTitle')
+    number_of_questions = data.get('numberOfQuestions')
 
+    # Ensure job_title and number_of_questions are provided
+    if not job_title or not number_of_questions:
+        return jsonify({"error": "Both jobTitle and numberOfQuestions are required"}), 400
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": f"You are a highly skilled Technical  interviewer. Generate {number_of_questions} Technical  interview questions for the role of {job_title}. These should be common technical questions, focus on technical specifics."
+            }
+        ]
+    )
+
+    generated_questions = response.choices[0].message['content'].strip()
+
+    question_list = [q.strip() for q in generated_questions.split('\n') if q.strip()]
+
+    return jsonify({"questions": question_list})
+
+
+@chatBot_bp.route('/generateFeedbackTechnical', methods=['POST'])
+def generateFeedbackTechnical():
+    data = request.get_json()
+    interview_data = data.get('interviewData')
+    print(interview_data)
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are Lucas, an HR professional providing feedback to the candidate. For each interview question, provide structured feedback "
+                    "with the following format:\n\n"
+                    "Question: [The interview question]\n"
+                    "Answer: [The candidate's response]\n"
+                    "\tplus: [Positive aspects of the answer]\n"
+                    "\tminus: [Areas for improvement]\n\n"
+                    "Be constructive and supportive in your feedback. Here is the interview data:\n\n"
+                    f"{interview_data}"
+                )
+            }
+        ]
+    )
+
+    feedback = response.choices[0].message['content'].strip('" ')
+    return jsonify({"feedback": feedback})
 
 
 
