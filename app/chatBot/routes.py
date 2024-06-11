@@ -2,9 +2,15 @@ import time
 from flask import Blueprint, jsonify, request, current_app
 import openai
 import config
+from openai import OpenAI
+import uuid
+import traceback
 
 chatBot_bp = Blueprint('chatBot', __name__)
 openai.api_key = config.OPEN_AI_API_KEY
+client = OpenAI(api_key=config.OPEN_AI_API_KEY)
+ASSISTANT_ID = config.ASSISTANT_ID
+
 
 @chatBot_bp.route('/chatEthan', methods=['POST'])
 def chat_ethan():
@@ -231,6 +237,81 @@ def generateFeedbackTechnical():
 
     feedback = response.choices[0].message['content'].strip('" ')
     return jsonify({"feedback": feedback})
+
+threads = {}
+
+def get_assistant_id(client):
+    try:
+        # Assuming `client.beta.assistants.list` lists all assistants
+        response = client.beta.assistants.list()
+        assistants = response.data
+        print(assistants)
+        for assistant in assistants:
+            # Replace the condition with your actual logic to pick the correct assistant
+            if assistant.name == 'Ana':
+                print(assistant.id)
+                return assistant.id
+        return None
+    except Exception as e:
+        print("An error occurred while fetching the assistant ID:", str(e))
+        print(traceback.format_exc())
+        return None
+
+
+@chatBot_bp.route('/chatAna', methods=['POST'])
+def ask_assistant():
+    data = request.get_json()
+    print(data)
+    user_id = data.get("user_id")  # Assuming you have some way to identify users
+    user_message = data.get("message")
+
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    # Check if there's an existing thread for the user
+    if user_id in threads:
+        thread_id = threads[user_id]
+    else:
+        # Generate a new thread ID
+        thread_id = str(uuid.uuid4())
+        threads[user_id] = thread_id  # Store the thread ID for future reference
+
+    try:
+
+        # Create a new thread with the user message
+        thread = client.beta.threads.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": user_message,
+                }
+            ]
+        )
+
+        # Send the thread to the assistant
+        print(thread.id)
+        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id='asst_cnH105xVOTIFkCmLLQCPb2w9')
+        print(run.status)
+
+        # Wait for the assistant's response
+        while run.status != "completed":
+            run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
+            time.sleep(1)
+
+        # Retrieve the assistant's response
+        message_response = client.beta.threads.messages.list(thread_id=thread.id)
+        messages = message_response.data
+
+        # Get the latest message from the thread
+        latest_message = messages[0]
+        print(latest_message.content[0].text.value)
+        return jsonify({"response": latest_message.content[0].text.value})
+
+    except Exception as e:
+        print("An error occurred:", str(e))
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
 
 
 

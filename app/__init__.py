@@ -10,6 +10,7 @@ from  .cvMaker.routes import cvMaker_bp
 from .notifications.routes import notifications_bp
 from .chatBot.routes import chatBot_bp
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_pyfile('../config.py')
