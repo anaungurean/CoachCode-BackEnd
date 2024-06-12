@@ -271,10 +271,10 @@ def ask_assistant():
     # Check if there's an existing thread for the user
     if user_id in threads:
         thread_id = threads[user_id]
+        print("Thread ID exists")
     else:
-        # Generate a new thread ID
         thread_id = str(uuid.uuid4())
-        threads[user_id] = thread_id  # Store the thread ID for future reference
+        threads[user_id] = thread_id
 
     try:
 
@@ -290,7 +290,7 @@ def ask_assistant():
 
         # Send the thread to the assistant
         print(thread.id)
-        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id='asst_cnH105xVOTIFkCmLLQCPb2w9')
+        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id='asst_dbuFX2cr8nRT0rUFeTMq1epx')
         print(run.status)
 
         # Wait for the assistant's response
@@ -301,10 +301,9 @@ def ask_assistant():
         # Retrieve the assistant's response
         message_response = client.beta.threads.messages.list(thread_id=thread.id)
         messages = message_response.data
-
         # Get the latest message from the thread
         latest_message = messages[0]
-        print(latest_message.content[0].text.value)
+
         return jsonify({"response": latest_message.content[0].text.value})
 
     except Exception as e:
