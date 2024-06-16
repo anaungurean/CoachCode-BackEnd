@@ -4,7 +4,6 @@ from .cv_model import CV
 from .school_model import School
 from .workexperience_model import WorkExperience
 from .project_model import Project
-from app.auth import User
 from app.database import db
 import pdfkit
 from flask import Blueprint, jsonify, request, current_app

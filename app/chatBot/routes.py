@@ -5,26 +5,45 @@ import config
 from openai import OpenAI
 import uuid
 import traceback
+import jwt
+from functools import wraps
 
 chatBot_bp = Blueprint('chatBot', __name__)
 openai.api_key = config.OPEN_AI_API_KEY
 client = OpenAI(api_key=config.OPEN_AI_API_KEY)
 ASSISTANT_ID = config.ASSISTANT_ID
 
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+
+        try:
+            data = jwt.decode(token.split(' ')[1], current_app.config['SECRET_KEY'], algorithms=["HS256"])
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Invalid token'}), 403
+
+        return f(*args, **kwargs)
+
+    return decorated
+
 
 @chatBot_bp.route('/chatEthan', methods=['POST'])
+@token_required
 def chat_ethan():
     data = request.json
     user_message = data.get("message")
     conversation_history = data.get("conversation_history", [])
 
-    # Ensure the initial system message is in the conversation history
     if not conversation_history:
         conversation_history.append(
             {"role": "system", "content": 'You are Ethan, a highly skilled AI. Provide detailed feedback, identify bugs, and give actionable suggestions to improve and fix the code.'}
         )
 
-    # Add the user's message to the conversation history
     conversation_history.append({"role": "user", "content": user_message})
 
     def is_relevant_message_ethan(message):
@@ -45,23 +64,34 @@ def chat_ethan():
             "python", "java", "javascript", "c++", "c#", "ruby", "php", "swift", "kotlin", "typescript",
             "go", "rust", "scala", "r", "perl", "bash", "shell", "sql", "html", "css", "xml", "json",
             "yaml", "markdown", "docker", "kubernetes", "aws", "azure", "gcp", "firebase", "heroku",
-            "netlify", "vercel", "git", "github", "gitlab", "bitbucket", "jira", "confluence", "slack"
+            "netlify", "vercel", "git", "github", "gitlab", "bitbucket", "jira", "confluence", "slack", "c",
+            "programming language", "web development", "mobile development", "cloud computing", "devops",
+            "software engineering", "software development", "software architecture", "software testing",
+            "software deployment", "software maintenance", "software support", "software documentation",
+            "software versioning", "software licensing", "software security", "software compliance",
+            "bug tracking", "issue tracking", "version control", "continuous integration", "continuous deployment",
+            "hello", "hi", "hey", "howdy", "greetings", "good morning", "good afternoon", "good evening",
+            "good night", "good day", "goodbye", "farewell", "see you", "talk to you", "chat with you",
+            "help", "support", "assist", "aid", "guide", "advise", "recommend", "suggest", "propose",
+            "explain", "clarify", "elaborate", "detail", "describe", "define", "specify", "identify",
+            "recognize", "diagnose", "analyze", "evaluate", "assess", "review", "inspect", "examine",
+            "test", "verify", "validate", "check", "audit", "audit", "audit", "audit", "audit", "audit",
+            "thank", "thanks", "appreciate", "grateful", "gratitude", "thankful", "thank you", "thanks a lot",
+
         ]
         return any(keyword in message.lower() for keyword in keywords)
 
-    print(is_relevant_message_ethan(user_message))
     if not is_relevant_message_ethan(user_message):
         irrelevant_response = "I'm here to help with code reviews, bug identification, and coding improvements. Please ask a related question."
         conversation_history.append({"role": "assistant", "content": irrelevant_response})
         return jsonify({"response": irrelevant_response, "conversation_history": conversation_history})
 
-    # Generate a response from OpenAI
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model='gpt-4',
         messages=conversation_history
     )
 
-    chat_response = response.choices[0].message['content']
+    chat_response = response.choices[0].message.content.strip()
     conversation_history.append({"role": "assistant", "content": chat_response})
 
     return jsonify({"response": chat_response, "conversation_history": conversation_history})
@@ -69,24 +99,22 @@ def chat_ethan():
 
 
 @chatBot_bp.route('/chatAva', methods=['POST'])
+@token_required
 def chat_ava():
     data = request.json
     user_message = data.get("message")
     conversation_history = data.get("conversation_history", [])
 
-
-    # Ensure the initial system message is in the conversation history
     if not conversation_history:
         conversation_history.append(
             {"role": "system", "content": 'You are Ava, a friendly Job Search Advisor in IT. Provide expert advice and practical tips on crafting CVs, acing interviews, and navigating job offers. Be supportive and encouraging. Answer in maximum 100 words.'}
         )
 
-    # Add the user's message to the conversation history
     conversation_history.append({"role": "user", "content": user_message})
 
     def is_relevant_message(message):
         keywords = [
-            "CV", "resume", "interview", "job offer", "job search", "cover letter", "application",
+            "cv", "resume", "interview", "job offer", "job search", "cover letter", "application",
             "networking", "salary negotiation", "job opening", "career advice", "hiring process",
             "LinkedIn", "portfolio", "references", "job market", "employment", "job position",
             "recruitment", "headhunter", "job board", "job fair", "internship", "freelance",
@@ -103,41 +131,45 @@ def chat_ava():
             "resume advice", "job search strategy", "interview strategy", "job market trends",
             "career opportunities", "networking events", "job fairs", "career fairs", "job",
             "career", "work", "employment", "job application", "job interview", "job offer",
-            "job search", "job seeker", "job candidate", "job applicant", "job seeker", "job seeker"
+            "job search", "job seeker", "job candidate", "job applicant", "job seeker", "job seeker",
+            "help", "support", "assist", "aid", "guide", "advise", "recommend", "suggest", "propose",
+            "explain", "clarify", "elaborate", "detail", "describe", "define", "specify", "identify",
+            "hello", "hi", "hey", "howdy", "greetings", "good morning", "good afternoon", "good evening",
+            "good night", "good day", "goodbye", "farewell", "see you", "talk to you", "chat with you",
+            "thank", "thanks", "appreciate", "grateful", "gratitude", "thankful", "thank you", "thanks a lot",
+
          ]
         return any(keyword in message.lower() for keyword in keywords)
 
-    print (is_relevant_message(user_message))
     if not is_relevant_message(user_message):
-        irrelevant_response = "I'm here to help with job search advice, including CVs, interviews, and job offers. Please ask a related question."
+        irrelevant_response = "I'm here to help with career advice, including CVs, interviews, and job hints. Please ask a related question."
         conversation_history.append({"role": "assistant", "content": irrelevant_response})
         return jsonify({"response": irrelevant_response, "conversation_history": conversation_history})
 
-    # Generate a response from OpenAI
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model='gpt-4',
         messages=conversation_history,
-        max_tokens=150,  # Adjust to ensure the response is concise
+        max_tokens=150,
         temperature=0.7
     )
 
-    chat_response = response.choices[0].message['content']
+    chat_response = response.choices[0].message.content.strip()
     conversation_history.append({"role": "assistant", "content": chat_response})
 
     return jsonify({"response": chat_response, "conversation_history": conversation_history})
 
 
 @chatBot_bp.route('/generateHRQuestions', methods=['POST'])
+@token_required
 def generateHRQuestions():
     data = request.get_json()
     job_title = data.get('jobTitle')
     number_of_questions = data.get('numberOfQuestions')
 
-    # Ensure job_title and number_of_questions are provided
     if not job_title or not number_of_questions:
         return jsonify({"error": "Both jobTitle and numberOfQuestions are required"}), 400
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {
@@ -147,20 +179,20 @@ def generateHRQuestions():
         ]
     )
 
-    generated_questions = response.choices[0].message['content'].strip()
-
+    generated_questions = response.choices[0].message.content.strip()
     question_list = [q.strip() for q in generated_questions.split('\n') if q.strip()]
 
     return jsonify({"questions": question_list})
 
 
 @chatBot_bp.route('/generateFeedbackHR', methods=['POST'])
+@token_required
 def generateFeedbackHR():
     data = request.get_json()
     interview_data = data.get('interviewData')
     print(interview_data)
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {
@@ -179,21 +211,21 @@ def generateFeedbackHR():
         ]
     )
 
-    feedback = response.choices[0].message['content'].strip('" ')
+    feedback = response.choices[0].message.content.strip()
     return jsonify({"feedback": feedback})
 
 
 @chatBot_bp.route('/generateTechnicalQuestions', methods=['POST'])
+@token_required
 def generateTechnicalQuestions():
     data = request.get_json()
     job_title = data.get('jobTitle')
     number_of_questions = data.get('numberOfQuestions')
 
-    # Ensure job_title and number_of_questions are provided
     if not job_title or not number_of_questions:
         return jsonify({"error": "Both jobTitle and numberOfQuestions are required"}), 400
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {
@@ -203,20 +235,18 @@ def generateTechnicalQuestions():
         ]
     )
 
-    generated_questions = response.choices[0].message['content'].strip()
-
+    generated_questions = response.choices[0].message.content.strip()
     question_list = [q.strip() for q in generated_questions.split('\n') if q.strip()]
-
     return jsonify({"questions": question_list})
 
 
 @chatBot_bp.route('/generateFeedbackTechnical', methods=['POST'])
+@token_required
 def generateFeedbackTechnical():
     data = request.get_json()
     interview_data = data.get('interviewData')
-    print(interview_data)
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {
@@ -235,21 +265,17 @@ def generateFeedbackTechnical():
         ]
     )
 
-    feedback = response.choices[0].message['content'].strip('" ')
+    feedback = response.choices[0].message.content.strip()
     return jsonify({"feedback": feedback})
 
 threads = {}
 
 def get_assistant_id(client):
     try:
-        # Assuming `client.beta.assistants.list` lists all assistants
         response = client.beta.assistants.list()
         assistants = response.data
-        print(assistants)
         for assistant in assistants:
-            # Replace the condition with your actual logic to pick the correct assistant
             if assistant.name == 'Ana':
-                print(assistant.id)
                 return assistant.id
         return None
     except Exception as e:
@@ -259,16 +285,16 @@ def get_assistant_id(client):
 
 
 @chatBot_bp.route('/chatAna', methods=['POST'])
+@token_required
 def ask_assistant():
     data = request.get_json()
-    print(data)
-    user_id = data.get("user_id")  # Assuming you have some way to identify users
+
+    user_id = data.get("user_id")
     user_message = data.get("message")
 
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 
-    # Check if there's an existing thread for the user
     if user_id in threads:
         thread_id = threads[user_id]
         print("Thread ID exists")
@@ -277,8 +303,6 @@ def ask_assistant():
         threads[user_id] = thread_id
 
     try:
-
-        # Create a new thread with the user message
         thread = client.beta.threads.create(
             messages=[
                 {
@@ -288,20 +312,15 @@ def ask_assistant():
             ]
         )
 
-        # Send the thread to the assistant
-        print(thread.id)
-        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id='asst_dbuFX2cr8nRT0rUFeTMq1epx')
-        print(run.status)
 
-        # Wait for the assistant's response
+        run = client.beta.threads.runs.create(thread_id=thread.id, assistant_id='asst_dbuFX2cr8nRT0rUFeTMq1epx')
+
         while run.status != "completed":
             run = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=run.id)
             time.sleep(1)
 
-        # Retrieve the assistant's response
         message_response = client.beta.threads.messages.list(thread_id=thread.id)
         messages = message_response.data
-        # Get the latest message from the thread
         latest_message = messages[0]
 
         return jsonify({"response": latest_message.content[0].text.value})
