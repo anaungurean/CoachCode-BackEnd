@@ -22,7 +22,7 @@ class User(db.Model):
         return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def create_user(cls, email, password, first_name=None, last_name=None, username=None, photo_url=None, status=None, goal=None, linkedin_url=None, github_url=None, facebook_url=None):
+    def create_user(cls, email, password, first_name, last_name, username=None, photo_url=None, status=None, goal=None, linkedin_url=None, github_url=None, facebook_url=None):
         hashed_password = bcrypt_sha256.hash(password)
         new_user = cls(first_name=first_name, last_name=last_name, email=email, password=hashed_password, username=username, photo_url=photo_url, status=status, goal=goal, linkedin_url=linkedin_url, github_url=github_url, facebook_url=facebook_url)
         db.session.add(new_user)

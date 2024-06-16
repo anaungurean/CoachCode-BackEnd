@@ -13,6 +13,8 @@ def create_user():
     data = request.json
     email = data.get('email')
     password = data.get('password')
+    first_name = data.get('firstName')
+    last_name = data.get('lastName')
 
     if not email or not password:
         return jsonify({"error": "Email and password are required"}), 400
@@ -22,7 +24,7 @@ def create_user():
     if existing_user:
         return jsonify({"error": "Email already exists"}), 409  # Conflict
 
-    new_user = User.create_user(email, password)
+    new_user = User.create_user(email, password, first_name, last_name)
 
     return jsonify({"message": "User created successfully"}), 201
 
