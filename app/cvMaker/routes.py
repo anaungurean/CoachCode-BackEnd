@@ -10,10 +10,14 @@ from flask import Blueprint, jsonify, request, current_app
 import jwt
 from functools import wraps
 from .utils import extract_user_id
-import openai
+from openai import OpenAI
 import config
+import openai
+
 
 cvMaker_bp = Blueprint('cvMaker', __name__)
+client = OpenAI(api_key=config.OPEN_AI_API_KEY)
+openai.api_key = config.OPEN_AI_API_KEY
 
 def token_required(f):
     @wraps(f)
@@ -29,7 +33,6 @@ def token_required(f):
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Invalid token'}), 403
 
-        # If the token is valid, allow access to the protected route
         return f(*args, **kwargs)
 
     return decorated
@@ -68,6 +71,7 @@ def update_and_generate_pdf():
         new_school = School(cv_id=cv.cv_id, **school_data)
         db.session.add(new_school)
 
+
     WorkExperience.query.filter_by(cv_id=cv.cv_id).delete()
     db.session.commit()
     for work_experience in data.get('workExperiences', []):
@@ -75,7 +79,6 @@ def update_and_generate_pdf():
         new_work_experience = WorkExperience(cv_id=cv.cv_id, **work_experience_data)
         db.session.add(new_work_experience)
 
-    # Actualizează proiectele
     Project.query.filter_by(cv_id=cv.cv_id).delete()
     db.session.commit()
     for project in data.get('projects', []):
@@ -165,7 +168,7 @@ def rephrase_description():
     data = request.json
     text = data.get('text')
     openai.api_key = config.OPEN_AI_API_KEY
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system",
@@ -176,7 +179,8 @@ def rephrase_description():
         temperature=0.6,
     )
 
-    rephrased_text = response.choices[0].message['content'].strip()
+    rephrased_text = response.choices[0].message.content.strip()
+    print(rephrased_text)
     return jsonify({'rephrasedText': rephrased_text})
 
 

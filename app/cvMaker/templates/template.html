@@ -10,17 +10,16 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
             color: #333;
+            background-color: #f4f4f4;
         }
 
         header {
-            background-color: #4CAF51;
+            background-color: #4CAF50;
             color: white;
-            padding: 10px 0;
+            padding: 10px;
             text-align: center;
         }
 
@@ -28,79 +27,83 @@
             margin: 0;
         }
 
-        header p {
-            margin: 5px 0;
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        header a {
+        .contact-info-item {
+            margin: 4px;
+        }
+
+        .contact-info-item p {
+            margin: 0;
+        }
+
+        .contact-info-item a {
             color: white;
             text-decoration: none;
         }
 
-        .contact-info {
-            display: flex;
-            justify-content: flex-end; /* Align contact info to the right */
-            gap: 5px;
-            flex-wrap: wrap;
-            margin-right: 20px; /* Add margin to the right for spacing */
-        }
-
-        .contact-info-item {
-            margin-top: 5px; /* Add some spacing between each contact info item */
-        }
-
         section {
             background-color: white;
-            padding: 1px 10px 2px;
+            margin: 10px auto;
             border-radius: 8px;
-            margin: 15px 15px 5px;
+            padding-left: 10px;
+            padding-right: 10px;
+            padding-top: 1px;
+            padding-bottom: 1px;
+            max-width: 900px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         section h2 {
             border-bottom: 2px solid #4CAF50;
+            padding-bottom: 2px;
         }
 
         ul {
             list-style: none;
             padding: 0;
-            margin: 0;
         }
 
         ul li {
-            margin-bottom: 10px;
+            margin: 10px 0;
+        }
+
+       .school-details {
+          flex: 1;
+        }
+
+        .job-details,
+        .project-details {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-      .school-details {
-            display: flex;
-            justify-content: space-between;
+        .job-info
+        {
+            flex: 1;
+        }
+        .project-description {
+            margin: 5px 0 0 20px;
         }
 
-        .graduation-info {
-    display: flex;
-    justify-content: space-between;
-}
-
-.degree-info {
-    flex-grow: 1;
-    text-align: left;
-}
-
-.other-info {
-    text-align: right;
-}
-
-
-
-        a {
-            color: #4CAF50;
-            text-decoration: none;
+        .project-description em {
+            font-weight: bold;
+            margin-top: 10px;
         }
 
-        a:hover {
-            text-decoration: underline;
+
+        .icon {
+            margin-right: 8px;
+        }
+
+        .responsibilities ul {
+            margin: 5px 0 0 20px;
         }
     </style>
 </head>
@@ -123,46 +126,46 @@
             </div>
         </div>
     </header>
+
     <section id="about">
         <h2>About Me</h2>
         <p>{{ formData.description }}</p>
     </section>
 
     <section id="education">
-    <h2>Education</h2>
-    <ul>
-        {% for school in formData.schools %}
-        <li>
-            <div class="school-details">
-                <div class="school-info">
-                    <strong>{{ school.school }}</strong>
+        <h2>Education</h2>
+        <ul>
+            {% for school in formData.schools %}
+            <li>
+                <div class="school-details">
+                    <strong>{{ school.school }}</strong>, {{ school.degree }}<br>
+                    <small>{{ school.graduation_year }}</small>, {{ school.city }} <br>
                 </div>
-                <div class="graduation-info">
-                    <div class="degree-info">
-                        <small>{{ school.degree }}</small>
-                    </div>
-                    <div class="other-info">
-                        <small>{{ school.graduationYear }}</small>
-                        <small>{{ school.city }}</small>
-                    </div>
+                <div class = "responsibilities">
+                    <ul>
+                        <li>{{ school.description }}</li>
+                    </ul>
                 </div>
-            </div>
-        </li>
-        {% endfor %}
-    </ul>
-</section>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
 
     <section id="work-experience">
         <h2>Work Experience</h2>
         <ul>
             {% for job in formData.workExperiences %}
             <li>
-                <strong>{{ job.position }}</strong>, {{ job.company }} - {{ job.location }}<br>
-                <small>{{ job.startDate }} - {{ job.endDate }}</small><br>
-                <div class="responsibilities">Responsibilities:
-                    <ul>
-                        <li>{{ job.responsibilities }}</li>
-                    </ul>
+                <div class="job-details">
+                    <div class="job-info">
+                        <strong>{{ job.position }}</strong>, {{ job.company }} - {{ job.location }}<br>
+                        <small>{{ job.startDate }} - {{ job.endDate }}</small><br>
+                        <div class="responsibilities">
+                            <ul>
+                                <li>{{ job.responsibilities }}</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </li>
             {% endfor %}
@@ -174,10 +177,17 @@
         <ul>
             {% for project in formData.projects %}
             <li>
-                <strong>{{ project.name }}</strong><br>
-                {{ project.description }}<br>
-                Technologies: {{ project.technologies }}<br>
-                Link: <a href="{{ project.link }}" target="_blank">{{ project.link }}</a>
+                <div class="project-details">
+                    <div class="project-info">
+                        <strong>{{ project.name }}</strong> - <a href="{{ project.link }}" target="_blank">{{ project.link }}</a> <br>
+                        <div class="project-description">
+                        {{ project.description }}<br>
+                         <em>Technologies:  </em>{{ project.technologies }}
+
+                        </div>
+                    </div>
+
+                </div>
             </li>
             {% endfor %}
         </ul>

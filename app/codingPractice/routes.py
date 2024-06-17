@@ -2,7 +2,7 @@ import jwt
 from functools import wraps
 from flask import Blueprint, jsonify, request, current_app
 from .problem_model import Problem
-from .utils import  check_submission_exists, extract_user_id
+from .utils import  check_submission_exists, extract_user_id, generate_hints, generate_solutions, generate_question
 
 def token_required(f):
     @wraps(f)
@@ -42,7 +42,23 @@ def get_problem_by_id(problem_id):
     problem = Problem.get_problem_by_id(problem_id)
     user_id = extract_user_id(request.headers.get('Authorization'))
     is_solved = check_submission_exists(user_id, problem_id)
+
+    if problem['hints'] is None:
+        new_hints = generate_hints(problem['description'])
+        Problem.add_hints(problem['id'], new_hints)
+        problem['hints'] = new_hints
+
+    if problem['solution'] is None:
+        solutions = generate_solutions(problem['description'])
+        Problem.add_solution(problem['id'], solutions)
+        problem['solution'] = solutions
     problem['is_solved'] = is_solved
+
+    if problem['question'] is None:
+        question = generate_question(problem['description'])
+        Problem.add_question(problem['id'], question)
+        problem['question'] = question
+
 
     if problem:
         return jsonify(problem), 200

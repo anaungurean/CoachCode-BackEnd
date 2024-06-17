@@ -11,6 +11,7 @@ class School(db.Model):
     degree = db.Column(db.String(100))
     graduation_year = db.Column(db.Integer)
     city = db.Column(db.String(50))
+    description = db.Column(db.Text)
 
     def to_dict(self):
         return {
@@ -19,7 +20,8 @@ class School(db.Model):
             'school': self.school,
             'degree': self.degree,
             'graduation_year': self.graduation_year,
-            'city': self.city
+            'city': self.city,
+            'description': self.description
         }
 
     @classmethod

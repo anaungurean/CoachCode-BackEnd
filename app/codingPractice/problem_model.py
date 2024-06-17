@@ -17,7 +17,7 @@ class Problem(db.Model):
     solution = db.Column(db.JSON, nullable=True)
     hints = db.Column(ARRAY(db.String(1000)), nullable=True)
     question = db.Column(db.JSON, nullable=True)
-    base_code =  db.Column(db.JSON, nullable=True)
+    base_code = db.Column(db.JSON, nullable=True)
 
     @classmethod
     def get_all_problems(cls):
@@ -28,6 +28,26 @@ class Problem(db.Model):
     def get_problem_by_id(cls, problem_id):
         problem = cls.query.filter_by(id=problem_id).first()
         return problem.to_dict() if problem else None
+
+    @classmethod
+    def add_hints(cls, id_problem, hints):
+        problem = cls.query.filter_by(id=id_problem).first()
+        problem.hints = hints
+        db.session.commit()
+
+    @classmethod
+    def add_solution(cls, id_problem, solution):
+        problem = cls.query.filter_by(id=id_problem).first()
+        problem.solution = solution
+        db.session.commit()
+
+    @classmethod
+    def add_question(cls, id_problem, question):
+        problem = cls.query.filter_by(id=id_problem).first()
+        problem.question = question
+        db.session.commit()
+
+
 
     def to_dict(self):
         return {
@@ -46,5 +66,7 @@ class Problem(db.Model):
             "question": self.question,
             "base_code": self.base_code
         }
+
+
 
 
