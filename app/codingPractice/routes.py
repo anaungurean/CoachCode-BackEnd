@@ -2,7 +2,7 @@ import jwt
 from functools import wraps
 from flask import Blueprint, jsonify, request, current_app
 from .problem_model import Problem
-from .utils import  check_submission_exists, extract_user_id, generate_hints, generate_solutions, generate_question
+from .utils import  check_submission_exists, extract_user_id, generate_hints, generate_solutions, generate_question, generate_tests
 
 def token_required(f):
     @wraps(f)
@@ -59,6 +59,10 @@ def get_problem_by_id(problem_id):
         Problem.add_question(problem['id'], question)
         problem['question'] = question
 
+    if problem['tests'] is  None:
+        tests = generate_tests(problem['description'])
+        Problem.add_tests(problem['id'], tests)
+        problem['tests'] = tests
 
     if problem:
         return jsonify(problem), 200

@@ -47,6 +47,12 @@ class Problem(db.Model):
         problem.question = question
         db.session.commit()
 
+    @classmethod
+    def add_tests(cls, id_problem, tests):
+        problem = cls.query.filter_by(id=id_problem).first()
+        problem.tests = tests
+        db.session.commit()
+
 
 
     def to_dict(self):

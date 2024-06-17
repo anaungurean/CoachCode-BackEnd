@@ -4,6 +4,8 @@ import jwt
 import config
 from openai import OpenAI
 import openai
+import json
+import re
 
 openai.api_key = config.OPEN_AI_API_KEY
 client = OpenAI(api_key=config.OPEN_AI_API_KEY)
@@ -81,25 +83,31 @@ def generate_solutions(problem_description):
 
     return json
 
-
+def remove_hidden_characters(s):
+    """
+    Elimină caracterele ascunse dintr-un șir de caractere.
+    """
+    return re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', s).strip()
 
 
 def generate_question(problem_description):
+
+    structure = {
+        "question": "Your question here",
+        "options": {
+            "A": "Option A",
+            "B": "Option B",
+            "C": "Option C",
+            "D": "Option D",
+            "E": "Option E"
+        },
+        "correct_answer": "Correct option letter"
+    }
+
     prompt = (
         f"You are a helpful assistant. Based on the following problem description, generate a short theoretical question "
-        f"with multiple-choice options and identify the correct answer. The response should have the following structure:\n"
-        f"{{\n"
-        f"  \"question\": \"Your question here\",\n"
-        f"  \"options\": {{\n"
-        f"    \"A\": \"Option A\",\n"
-        f"    \"B\": \"Option B\",\n"
-        f"    \"C\": \"Option C\",\n"
-        f"    \"D\": \"Option D\",\n"
-        f"    \"E\": \"Option E\"\n"
-        f"  }},\n"
-        f"  \"correct_answer\": \"Correct option letter\"\n"
-        f"}}\n"
-        f"Problem description: {problem_description}"
+        f"with multiple-choice options and identify the correct answer. The response should have the following structure, "
+        f"{json.dumps(structure)} Problem description: {problem_description}"
     )
 
     response = client.chat.completions.create(
@@ -107,24 +115,52 @@ def generate_question(problem_description):
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful assistant."
-            },
-            {
-                "role": "user",
                 "content": prompt
             }
         ]
     )
 
-    # Extract the generated content
-    generated_question = response.choices[0].message.content.strip()
-    generated_question = generated_question.replace("\n", "")
-    generated_question = generated_question.replace("\"", " ")
-    print(generated_question)
+    question_data = json.loads(response.choices[0].message.content.strip())
+    question_data['question'] = remove_hidden_characters(question_data['question'])
+    question_data['correct_answer'] = remove_hidden_characters(question_data['correct_answer'])
+    question_data['options'] = {k: remove_hidden_characters(v) for k, v in question_data['options'].items()}
+
+    print(question_data)
+
+    return question_data
 
 
-    return generated_question
+def generate_tests(problem_description):
+    # Construiește promptul conform structurii cerute
+    prompt = (
+        f"You are a helpful assistant. Generate 10 test cases for the following problem. {problem_description}\n"
+        f"I want to follow this structure. Input to be one string, delimit the variables from input by slash n (/n) \n"
+        f"[\n"
+        f"  {{\n"
+        f'    "input": "1 2 3 4 5\\n9",\n'
+        f'    "output_java": "output_java_here",\n'
+        f'    "output_python": "output_python_here"\n'
+        f"  }},\n"
+        f"]"
+    )
 
+    # Trimite promptul către API-ul OpenAI pentru a genera răspunsul
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": prompt
+            }
+        ]
+    )
+
+    # Extrage răspunsul generat și parsează-l în teste individuale
+    generated_tests =  json.loads(response.choices[0].message.content.strip())
+
+
+
+    return  generated_tests
 
 
 
