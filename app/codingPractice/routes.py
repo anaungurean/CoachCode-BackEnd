@@ -2,7 +2,7 @@ import jwt
 from functools import wraps
 from flask import Blueprint, jsonify, request, current_app
 from .problem_model import Problem
-from .utils import  check_submission_exists, extract_user_id, generate_hints, generate_solutions, generate_question, generate_tests
+from .utils import  check_submission_exists, extract_user_id, generate_hints, generate_solutions, generate_question, generate_tests, generate_input_variables
 
 def token_required(f):
     @wraps(f)
@@ -18,7 +18,6 @@ def token_required(f):
         except jwt.InvalidTokenError:
             return jsonify({'message': 'Invalid token'}), 403
 
-        # Dacă tokenul este valid, permite accesul la ruta protejată
         return f(*args, **kwargs)
 
     return decorated
@@ -63,6 +62,11 @@ def get_problem_by_id(problem_id):
         tests = generate_tests(problem['description'])
         Problem.add_tests(problem['id'], tests)
         problem['tests'] = tests
+
+    if problem['input_variables'] is None:
+        input_variables = generate_input_variables(problem['description'])
+        Problem.add_input_variables(problem['id'], input_variables)
+        problem['input_variables'] = input_variables
 
     if problem:
         return jsonify(problem), 200

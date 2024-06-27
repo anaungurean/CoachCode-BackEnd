@@ -32,7 +32,6 @@ def send_email(to_email, subject, message):
         msg.attach(MIMEText(message, 'plain'))
 
         server.sendmail(email, to_email, msg.as_string())
-        print("Email sent successfully!")
         return True
     except Exception as e:
         print("Failed to send email. Error:", e)

@@ -53,6 +53,11 @@ class Problem(db.Model):
         problem.tests = tests
         db.session.commit()
 
+    @classmethod
+    def add_input_variables(cls, id_problem, input_variables):
+        problem = cls.query.filter_by(id=id_problem).first()
+        problem.input_variables = input_variables
+        db.session.commit()
 
 
     def to_dict(self):

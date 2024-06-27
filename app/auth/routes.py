@@ -66,7 +66,7 @@ def forgot_password():
     if user:
         reset_code = generate_reset_code()
         email_subject = "Password Reset Code"
-        email_body = f"Your password reset code is: {reset_code}"
+        email_body = (f"Hello,\n\nWe received a request to reset your password. Your password reset code is: {reset_code}\n\nPlease use this code to reset your password. It is available for 15 minutes only." "\n\nIf you did not request a password reset, please ignore this email.\n\nThank you,\nCoachCode Team")
         send_email(email, email_subject, email_body)
 
         reset_code = ResetCode.create_reset_code(email, reset_code)

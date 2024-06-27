@@ -11,9 +11,6 @@ openai.api_key = config.OPEN_AI_API_KEY
 client = OpenAI(api_key=config.OPEN_AI_API_KEY)
 
 def check_submission_exists(user_id, problem_id):
-    """
-    Check if a submission for a given user_id and problem_id exists.
-    """
     submission = Submission.get_submissions_by_user_id_and_problem_id(user_id, problem_id)
     return submission is not None
 
@@ -84,9 +81,6 @@ def generate_solutions(problem_description):
     return json
 
 def remove_hidden_characters(s):
-    """
-    Elimină caracterele ascunse dintr-un șir de caractere.
-    """
     return re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', s).strip()
 
 
@@ -131,9 +125,8 @@ def generate_question(problem_description):
 
 
 def generate_tests(problem_description):
-    # Construiește promptul conform structurii cerute
     prompt = (
-        f"You are a helpful assistant. Generate 10 test cases for the following problem. {problem_description}\n"
+        f"You are a helpful assistant. Extract test cases for the following problem. {problem_description}\n"
         f"I want to follow this structure. Input to be one string, delimit the variables from input by slash n (/n) \n"
         f"[\n"
         f"  {{\n"
@@ -144,7 +137,6 @@ def generate_tests(problem_description):
         f"]"
     )
 
-    # Trimite promptul către API-ul OpenAI pentru a genera răspunsul
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -154,15 +146,34 @@ def generate_tests(problem_description):
             }
         ]
     )
-
-    # Extrage răspunsul generat și parsează-l în teste individuale
-    generated_tests =  json.loads(response.choices[0].message.content.strip())
-
-
-
+    generated_tests = json.loads(response.choices[0].message.content.strip())
     return  generated_tests
 
+def generate_input_variables(problem_description):
+    promt = (
+        f"You are a helpful assistant. Extract the variables from the following problem description. {problem_description}\n"
+        f"I want to follow this structure. In the variable value don't include punctuation marks. Use spaces as delimiters.  \n"
+        f" [\n"
+        f"  {{\n"
+        f'    "name": "variable_name",\n'
+        f'    "value": "variable_value"\n'
+        f"  }},\n"
+        f"]"
+    )
 
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": promt
+            }
+        ]
+    )
+
+    variables = json.loads(response.choices[0].message.content.strip())
+    print(variables)
+    return variables
 
 
 
