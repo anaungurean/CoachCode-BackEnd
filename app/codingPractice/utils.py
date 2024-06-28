@@ -151,8 +151,8 @@ def generate_tests(problem_description):
 
 def generate_input_variables(problem_description):
     promt = (
-        f"You are a helpful assistant. Extract the variables from the following problem description. {problem_description}\n"
-        f"I want to follow this structure. In the variable value don't include punctuation marks. Use spaces as delimiters.  \n"
+        f"You are a helpful assistant. Extract the variables or the variable from the following problem description. {problem_description}\n"
+        f"I want to follow this structure. In the variable value don't include punctuation marks. Use spaces as delimiters. The variable value should not be the type and should be only one example.\n"
         f" [\n"
         f"  {{\n"
         f'    "name": "variable_name",\n'
@@ -162,7 +162,7 @@ def generate_input_variables(problem_description):
     )
 
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
@@ -172,7 +172,6 @@ def generate_input_variables(problem_description):
     )
 
     variables = json.loads(response.choices[0].message.content.strip())
-    print(variables)
     return variables
 
 

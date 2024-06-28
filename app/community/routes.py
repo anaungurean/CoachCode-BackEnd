@@ -7,6 +7,7 @@ from .like_models import QuestionLike, AnswerLike
 from .utils import extract_user_id
 from flask import send_file
 from ..auth import User
+from app.notifications.notification_model import Notification
 import os
 from werkzeug.utils import secure_filename
 
@@ -138,6 +139,9 @@ def update_question(question_id):
 @community_bp.route('/questions/<int:question_id>', methods=['DELETE'])
 @token_required
 def delete_question(question_id):
+    notification = Notification.query.filter_by(question_id=question_id).all()
+    for notif in notification:
+        notif.delete()
     likes = QuestionLike.query.filter_by(question_id=question_id).all()
     for like in likes:
         like.delete()

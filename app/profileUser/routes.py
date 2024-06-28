@@ -33,9 +33,7 @@ profileUser_bp = Blueprint('profile_user', __name__)
 def my_profile():
     token = request.headers.get('Authorization')
     user_id = extract_user_id(token)
-    print(user_id)
     user = User.query.filter_by(id=user_id).first()
-    print(user.to_dict())
     return jsonify(user.to_dict()), 200
 
 
