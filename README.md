@@ -1,60 +1,70 @@
-# Proiect CoachCode Backend Flask
+# CoachCode Backend Project with Flask
 
-Acest proiect este construit folosind Flask și include mai multe module pentru gestionarea diferitelor funcționalități. Mai jos găsiți detalii despre fiecare modul principal și instrucțiuni pentru deploy.
+This project serves as **my thesis project for my university degree**.  CoachCode addresses a crucial issue in the landscape of competitive IT interviews, providing a comprehensive suite of functionalities designed to empower users throughout their job search and interview preparation process. The application offers a range of features aimed at enhancing technical skills, interview performance, and preparation for a successful career. This project is built using Flask and includes multiple modules for managing various functionalities.  
 
-## Modulele Principale
+## **Documentation**
+[Licenta_Final.pdf](https://github.com/user-attachments/files/16427196/Licenta_Final.pdf)
+
+## **Presentation**
+[prezentare.pdf](https://github.com/user-attachments/files/16427217/prezentare.pdf)
+
+## **Demo**
+https://www.youtube.com/watch?v=yQLhxI329-s
+
+
+## Main Modules
 
 ### 1. Auth
 
-Modulul `auth` este responsabil pentru gestionarea autentificării și autorizării utilizatorilor. Include funcționalități pentru înregistrare, autentificare, resetare de parole și management de sesiuni.
+The `auth` module is responsible for managing user authentication and authorization. It includes features for registration, login, password reset, and session management.
 
 ### 2. Chatbot
 
-Modulul `chatbot` oferă funcționalități de chat utilizator-utilizator și interacțiuni automate bazate pe inteligență artificială pentru suport sau întrebări frecvente.
+The `chatbot` module provides functionalities for user-to-user chat and automated interactions based on artificial intelligence for support or frequently asked questions.
 
 ### 3. Coding Practice
 
-Modulul `codingpractice` facilitează practica pentru codare, oferind utilizatorilor exerciții, întrebări sau proiecte pentru a-și îmbunătăți abilitățile de programare.
+The `codingpractice` module facilitates coding practice, offering users exercises, questions, or projects to improve their programming skills.
 
 ### 4. Community
 
-Modulul `community` permite utilizatorilor să interacționeze și să colaboreze în cadrul unei comunități. Include funcționalități precum forumuri, grupuri de discuții și partajarea resurselor.
+The `community` module allows users to interact and collaborate within a community. It includes features like forums, discussion groups, and resource sharing.
 
 ### 5. CV Maker
 
-Modulul `cvmaker` permite utilizatorilor să creeze și să gestioneze CV-uri personalizate. Include funcționalități pentru încărcarea de imagini, editare de texte și export în diferite formate.
+The `cvmaker` module enables users to create and manage personalized resumes. It includes features for uploading images, editing text, and exporting in various formats.
 
 ### 6. Notification
 
-Modulul `notification` gestionează notificările pentru utilizatori. Include funcționalități pentru trimiterea și gestionarea notificărilor legate de activități ale utilizatorilor sau actualizări ale aplicației.
+The `notification` module manages user notifications. It includes functionalities for sending and managing notifications related to user activities or app updates.
 
 ### 7. Problem Submissions
 
-Modulul `problemsubmissions` permite utilizatorilor să trimită și să gestioneze probleme sau întrebări tehnice. Include funcționalități pentru evaluare, feedback și urmărirea progresului.
+The `problemsubmissions` module allows users to submit and manage technical problems or questions. It includes features for evaluation, feedback, and progress tracking.
 
 ### 8. Profile User
 
-Modulul `profileuser` facilitează gestionarea profilurilor utilizatorilor. Include funcționalități pentru încărcarea și gestionarea informațiilor de profil, inclusiv fotografii și descrieri personale.
+The `profileuser` module facilitates the management of user profiles. It includes features for uploading and managing profile information, including photos and personal descriptions.
 
-## Deploy
+## Deployment
 
-Pentru a face deploy-ul aplicației Flask, urmați acești pași:
+To deploy the Flask application, follow these steps:
 
-1. **Instalare dependințe**: Asigurați-vă că aveți toate dependințele instalate. Puteți instala dependințele listate în `requirements.txt` folosind `pip install -r requirements.txt`.
+1. **Install Dependencies**: Ensure all dependencies are installed. You can install the dependencies listed in `requirements.txt` using `pip install -r requirements.txt`.
    
-2. **Configurare**: Verificați și actualizați fișierul `config.py` cu setările adecvate pentru mediul de deploy (de exemplu, setările de bază de date, cheile secrete etc.).
+2. **Configuration**: Check and update the `config.py` file with the appropriate settings for the deployment environment (e.g., database settings, secret keys, etc.).
 
-3. **Setare și pornire**: Setați variabila de mediu `FLASK_APP` pentru a indica fișierul principal al aplicației (de obicei `run.py` sau `app/__init__.py`) și apoi porniți serverul Flask.
+3. **Setup and Launch**: Set the environment variable `FLASK_APP` to indicate the main application file (usually `run.py` or `app/__init__.py`) and then start the Flask server.
 
     ```bash
     export FLASK_APP=run.py
     flask run
     ```
 
-    Sau, dacă utilizați `python -m flask`:
+    Or, if using `python -m flask`:
 
     ```bash
     python -m flask run
     ```
 
-4. **Accesare aplicație**: Accesați aplicația în browser la adresa `http://localhost:5000` sau la adresa specificată de serverul Flask.
+4. **Access the Application**: Access the application in a browser at `http://localhost:5000` or the address specified by the Flask server.
