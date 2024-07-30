@@ -1,4 +1,4 @@
-# CoachCode Backend Project with Flask
+# Project CoachCode BackEnd Flask
 
 This project serves as **my thesis project for my university degree**.  CoachCode addresses a crucial issue in the landscape of competitive IT interviews, providing a comprehensive suite of functionalities designed to empower users throughout their job search and interview preparation process. The application offers a range of features aimed at enhancing technical skills, interview performance, and preparation for a successful career. This project is built using Flask and includes multiple modules for managing various functionalities.  
 
